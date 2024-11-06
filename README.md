@@ -2,7 +2,7 @@
 This repository contains implementation lab works
 
 # TO DO
-- [ ] Initial repoitory setup
+- [x] Initial repoitory setup
 - [ ] Lab Work 1
 - [ ] Lab Work 2
 - [ ] Lab Work 3
