@@ -1,3 +1,18 @@
-from fastapi import APIRouter
+import os
+import httpx
+from fastapi import APIRouter, Depends, Body
 
-router = APIRouter()
+from src.services.auth import get_current_user
+from src.services.streaming import stream_response
+from src.settings import settings
+
+router = APIRouter(prefix="/chat", tags=["chat"])
+
+
+@router.post("/completions")
+async def completions(body=Body(...)):
+    if "stream" in body and body["stream"]:
+        return await stream_response(settings.llm_chat_url, body)
+    else:
+        async with httpx.AsyncClient() as client:
+            return (await client.post(settings.llm_chat_url, json=body)).json()
