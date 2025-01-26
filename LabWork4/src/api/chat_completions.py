@@ -2,9 +2,8 @@ import os
 import httpx
 from fastapi import APIRouter, Depends, Body
 
-from src.services.auth import get_current_user
-from src.services.streaming import stream_response
-from src.settings import settings
+from src.services import stream_response
+from src.services import settings
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -12,7 +11,7 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 @router.post("/completions")
 async def completions(body=Body(...)):
     url = f"{settings.llm_chat_url}/v1/chat/completions"
-    
+
     if "stream" in body and body["stream"]:
         return await stream_response(url, body)
     else:

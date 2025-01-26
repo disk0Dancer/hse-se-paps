@@ -1,4 +1,4 @@
-.PHONY: install
+.PHONY: install dev run lint lint.fix typing fmt fmt.check test build build.docker
 
 install:
 	@echo "installing UV"
@@ -8,7 +8,7 @@ install:
 	uv sync
 
 dev:
-	uv run uvicorn 'src.app:app' --host=0.0.0.0 --port=8000 --reload
+	PYTHONPATH=src/ uv run uvicorn 'src.app:app' --host=0.0.0.0 --port=8000 --reload
 
 run:
 	uv run uvicorn 'src.app:app' --host=0.0.0.0 --port=8000
@@ -36,7 +36,3 @@ build:
 
 build.docker:
 	docker build --platform=linux/amd64 -t backend --output=backend-image .
-
-push.docker:
-	docker tag backend:latest
-	docker push backend:latest
