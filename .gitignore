@@ -88,10 +88,4 @@ celerybeat.pid
 **/.pytype/
 **/cython_debug/
 
-.mypy_cache/
-.dmypy.json
-dmypy.json
-.pyre/
-.pytype/
-cython_debug/
 **/.idea/
