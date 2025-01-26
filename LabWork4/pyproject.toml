@@ -1,0 +1,11 @@
+[project]
+name = "labwork4"
+version = "0.1.0"
+description = "api implementation"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.115.7",
+    "sqlmodel>=0.0.22",
+    "uvicorn>=0.34.0",
+]

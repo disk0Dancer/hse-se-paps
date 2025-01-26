@@ -1,0 +1,17 @@
+[project]
+name = "as-coding-assistant"
+version = "0.1.0"
+description = "HSE PAPS project"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.392.post0",
+    "pytest>=8.3.4",
+    "ruff>=0.9.3",
+]
+
+[tool.uv.workspace]
+members = ["LabWork4"]
