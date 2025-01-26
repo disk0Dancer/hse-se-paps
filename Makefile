@@ -1,26 +1,13 @@
-.PHONY: install
-
-install:
-	@echo "installing UV"
-	if [ ! -d "uv" ]; then curl -LsSf https://astral.sh/uv/install.sh | sh; fi
-	@echo "installing dependencies"
-	uv venv
-	uv sync
+.PHONY:
 
 lint:
-	ruff check
-	
-lint.fix:
-	ruff check --fix
-
-typing:
-	pyright --skipunannotated --ignoreexternal
-
-fmt:
-	ruff format
+	$(MAKE) -C LabWork4 lint
 
 fmt.check:
-	ruff format --check --diff
+	$(MAKE) -C LabWork4 fmt.check
 
 test:
-	pytest
+	$(MAKE) -C LabWork4 test
+
+build:
+	$(MAKE) -C LabWork4 build
