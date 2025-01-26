@@ -11,8 +11,10 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 @router.post("/completions")
 async def completions(body=Body(...)):
+    url = f"{settings.llm_chat_url}/v1/chat/completions"
+    
     if "stream" in body and body["stream"]:
-        return await stream_response(settings.llm_chat_url, body)
+        return await stream_response(url, body)
     else:
         async with httpx.AsyncClient() as client:
-            return (await client.post(settings.llm_chat_url, json=body)).json()
+            return (await client.post(url, json=body)).json()
