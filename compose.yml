@@ -1,0 +1,105 @@
+services:
+    postgres:
+        container_name: postgres_container
+        image: postgres
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER:-postgres}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+            PGDATA: /data/postgres
+        volumes:
+            - postgres:/data/postgres
+        ports:
+            - "5432:5432"
+        networks:
+            - postgres
+        restart: unless-stopped
+    
+    pgadmin:
+        container_name: pgadmin_container
+        image: dpage/pgadmin4
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+            PGADMIN_CONFIG_SERVER_MODE: 'False'
+        volumes:
+            - pgadmin:/var/lib/pgadmin
+        ports:
+            - "${PGADMIN_PORT:-5050}:80"
+        networks:
+            - postgres
+        restart: unless-stopped
+        logging:
+            driver: "none"
+    
+    llm-chat:
+        image: vllm/vllm-openai:latest
+        restart: unless-stopped
+        shm_size: '10gb'
+        volumes:
+            - ~/.cache/huggingface:/root/.cache/huggingface
+        entrypoint: python3
+        command: -m vllm.entrypoints.openai.api_server --port=5000 --host=0.0.0.0 --model  ${MODEL_CHECKPOINT:-Qwen/Qwen2.5-Coder-0.5B-Instruct}
+        environment:
+            - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN:-token}
+        ports:
+            - "8000:8000"
+        healthcheck:
+            test: [ "CMD", "curl", "-f", "http://0.0.0.0:5000/v1/models" ]
+            interval: 30s
+            timeout: 5s
+            retries: 20
+        networks:
+            - llm-chat
+
+    llm-completion:
+        image: vllm/vllm-openai:latest
+        restart: unless-stopped
+        shm_size: '10gb'
+        volumes:
+            - ~/.cache/huggingface:/root/.cache/huggingface
+        entrypoint: python3
+        command: -m vllm.entrypoints.openai.api_server --port=5000 --host=0.0.0.0 --model ${MODEL_CHECKPOINT:-Qwen/Qwen2.5-Coder-0.5B}
+        environment:
+            - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN:-token}
+        ports:
+            - "8000:8000"
+        healthcheck:
+            test: [ "CMD", "curl", "-f", "http://0.0.0.0:5000/v1/models" ]
+            interval: 30s
+            timeout: 5s
+            retries: 20
+        networks:
+            - llm-completion
+
+    backend:
+        build:
+            context: LabWork4/
+        ports:
+            - 8000:8000
+        develop:
+            watch:
+                -   action: sync
+                    path: /src
+                    target: /app
+                -   action: rebuild
+                    path: ./pyproject.toml
+        networks:
+            - postgres
+            - llm-chat
+            - llm-completion
+        
+        
+
+networks:
+    postgres:
+        driver: bridge
+    llm-chat:
+        driver: bridge
+    llm-completion:
+        driver: bridge
+
+volumes:
+    postgres:
+    pgadmin:
+    llm-chat:
+    llm-completion:
