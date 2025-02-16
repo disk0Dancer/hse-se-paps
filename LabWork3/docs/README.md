@@ -203,13 +203,15 @@ class User {
     + password: str
 }
 
-class Log {
+class AccessToken {
     + guid: int
-    + request: str
-    + response: str
+    + user_guid: str
+    + token: str
     + start_timestamp: datetime
     + end_timestamp: datetime
 }
+
+User ||--o{ AccessToken : has
 ```
 
 ### Применение основных принципов разработки
