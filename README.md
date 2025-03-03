@@ -1,15 +1,15 @@
 # hse-se-paps
-This repository contains implementation lab works
+This repository contains implementation lab works for the course **"Software systems architecture design."**
 
 # Tesis
 
-ru: Разработка интеллектуального ассистента программиста
-en: development of ai coding assistant
+#### ru: Разработка корпоративного ИИ-ассистента программиста
+#### en: Development of enterprise AI-coding assistant
 
 
 # TO DO
-- [x] Initial repoitory setup
-- [ ] Lab Work 1
+- [x] Initial repository setup
+- [x] Lab Work 1
 - [ ] Lab Work 2
 - [ ] Lab Work 3
 - [ ] Lab Work 4
