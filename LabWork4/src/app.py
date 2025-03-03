@@ -8,11 +8,14 @@ from sqlmodel import SQLModel, create_engine, Session
 
 from api import completions_router, chat_completions_router, healthcheck_router
 from services import settings
+from src.services.requests_logger import log_request
+from src.api.user import router as user_router
 
 app = FastAPI()
 app.include_router(completions_router, prefix="/api/v1")
 app.include_router(chat_completions_router, prefix="/api/v1")
 app.include_router(healthcheck_router, prefix="/api/v1")
+app.include_router(user_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,9 +25,15 @@ app.add_middleware(
 )
 
 
-
 @app.middleware("http")
 async def _auth(request: Request, call_next):
+    response = await call_next(request)
+    return response
+
+
+@app.middleware("http")
+async def request_logger_middleware(request: Request, call_next):
+    log_request(request)
     response = await call_next(request)
     return response
 
