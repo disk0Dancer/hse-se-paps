@@ -1,10 +1,19 @@
 [project]
-name = "as-coding-assistant"
+name = "labwork4"
 version = "0.1.0"
-description = "HSE PAPS project"
+description = "api implementation"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "fastapi>=0.115.7",
+    "httpx>=0.28.1",
+    "loguru>=0.7.3",
+    "pydantic>=2.10.6",
+    "pydantic-settings>=2.7.1",
+    "sqlmodel>=0.0.22",
+    "starlette>=0.45.3",
+    "uvicorn>=0.34.0",
+]
 
 [dependency-groups]
 dev = [
@@ -12,6 +21,3 @@ dev = [
     "pytest>=8.3.4",
     "ruff>=0.9.3",
 ]
-
-[tool.uv.workspace]
-members = ["LabWork4"]
