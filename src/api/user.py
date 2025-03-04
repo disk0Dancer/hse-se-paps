@@ -6,12 +6,14 @@ from src.models.user import User, UserCreate, UserUpdate
 
 router = APIRouter()
 
+
 @router.post("/user/", response_model=User)
 def create_user(user: UserCreate, session: Session = Depends(...)) -> User:
     session.add(User(**user.dict()))
     session.commit()
     session.refresh(user)
     return user
+
 
 @router.get("/user/", response_model=list[User])
 def read_users(
@@ -21,6 +23,7 @@ def read_users(
 ) -> list[User]:
     users = session.exec(select(User).offset(offset).limit(limit)).all()
     return users
+
 
 @router.get("/user/search", response_model=list[User])
 def search_users(
@@ -34,6 +37,7 @@ def search_users(
     results = session.exec(statement).all()
     return results
 
+
 @router.get("/user/{user_id}", response_model=User)
 def read_user(user_id: int, session: Session = Depends(...)) -> User:
     user = session.get(User, user_id)
@@ -41,8 +45,11 @@ def read_user(user_id: int, session: Session = Depends(...)) -> User:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
 @router.put("/user/{user_id}", response_model=User)
-def update_user(user_id: int, user_update: UserUpdate, session: Session = Depends(...)) -> User:
+def update_user(
+    user_id: int, user_update: UserUpdate, session: Session = Depends(...)
+) -> User:
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -53,6 +60,7 @@ def update_user(user_id: int, user_update: UserUpdate, session: Session = Depend
     session.commit()
     session.refresh(user)
     return user
+
 
 @router.delete("/user/{user_id}")
 def delete_user(user_id: int, session: Session = Depends(...)):
