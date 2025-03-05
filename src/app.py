@@ -1,66 +1,74 @@
-from typing import Annotated
-
 from loguru import logger
 
-from fastapi import FastAPI, Depends, Request
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import SQLModel, create_engine, Session
 
-from api import completions_router, chat_completions_router, healthcheck_router
-from services import settings
-from src.services.requests_logger import log_request
+from src.api.completions import router as completions_router
+from src.api.chat_completions import router as chat_completions_router
+from src.api.healthcheck import router as healthcheck_router
 from src.api.user import router as user_router
+from src.api.auth import router as auth_router
 
-app = FastAPI()
-app.include_router(completions_router, prefix="/api/v1")
-app.include_router(chat_completions_router, prefix="/api/v1")
-app.include_router(healthcheck_router, prefix="/api/v1")
-app.include_router(user_router)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+from src.services import settings
+from src.services.requests_logger import log_request, start_logger, stop_logger
 
 
-@app.middleware("http")
-async def _auth(request: Request, call_next):
-    response = await call_next(request)
-    return response
+class Application:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(Application, cls).__new__(cls)
+            app = FastAPI()
+
+            # Chain of Responsibility Pattern
+            app.include_router(completions_router, prefix="/api/v1")
+            app.include_router(chat_completions_router, prefix="/api/v1")
+            app.include_router(healthcheck_router)
+            app.include_router(user_router, prefix="/user")
+            app.include_router(auth_router)
+
+            # Proxy Pattern
+            app.add_middleware(
+                CORSMiddleware,
+                allow_origins=["*"],
+                allow_credentials=True,
+                allow_methods=["*"],
+                allow_headers=["*"],
+            )
+
+            # Middleware as Interceptor Pattern
+            @app.middleware("http")
+            async def auth_middleware(request: Request, call_next):
+                # implement
+                response = await call_next(request)
+                return response
+
+            # Observer Pattern
+            @app.middleware("http")
+            async def request_logger_middleware(request: Request, call_next):
+                await log_request(request)
+                response = await call_next(request)
+                return response
+
+            # Application Lifecycle Hooks
+            @app.on_event("startup")
+            async def on_startup():
+                logger.info(f"Settings: {settings.__dict__}")
+
+                await start_logger()
+                logger.info("Available endpoints:")
+                for route in app.routes:
+                    logger.info(f"\t{route.path}\tMethods={route.methods}")
+
+            @app.on_event("shutdown")
+            async def on_shutdown():
+                await stop_logger()
+
+            cls._instance.app = app
+
+        return cls._instance
 
 
-@app.middleware("http")
-async def request_logger_middleware(request: Request, call_next):
-    log_request(request)
-    response = await call_next(request)
-    return response
-
-
-sqlite_file_name = "database.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
-connect_args = {"check_same_thread": False}
-engine = create_engine(sqlite_url, echo=True, connect_args=connect_args)
-
-
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
-
-
-def get_session():
-    with Session(engine) as session:
-        yield session
-
-
-SessionDep = Annotated[Session, Depends(get_session)]
-
-
-@app.on_event("startup")
-def on_startup():
-    logger.info(f"Settings: {settings}")
-    create_db_and_tables()
-    # show routes
-    logger.info(f"Available endpoints:")
-    for route in app.routes:
-        logger.info(f"\t{route.path}\tMethods={route.methods}")
+application = Application()
+app = application.app
