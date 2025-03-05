@@ -33,10 +33,6 @@ skinparam actorStyle awesome
 title System Context diagram
 
 System(llmSystem, "LLM-based Code Assistant in IDE") {
-    Container(backend, "Backend API", "Python(FastAPI)", "Handles requests from IDE plugin")
-    ContainerDb(database, "Logs Database", "PostgreSQL", "Stores requests and responses")
-    Container(llmService1, "LLM Service1", "Python(Vllm)", "Processes requests and generates responses")
-    Container(llmService2, "LLM Service2", "Python(Vllm)", "Processes requests and generates responses")
 }
 System_Ext(idePlugin, "IDE Plugin", "React+Kotlin", "Interface for LLM interaction")
 System_Ext(gitlab, "GitLab", "VCS + Auth")
@@ -77,7 +73,7 @@ llmSystem --> gitlab : "Authenticates users"
 - Развертывание: каждый контейнер развертывается независимо, что упрощает обновления и поддержку системы.
 
 **Диаграмма:**
-
+импорт компонент
 ```plantuml
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
@@ -146,35 +142,42 @@ llmSystem <-- gitlab : "Sends deployment data"
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 left to right direction
+Person(dev, "Developer")
+System_Ext(idePlugin, "IDE Plugin", "React+Kotlin", "Interface for LLM interaction")
+System_Ext(gitlab, "GitLab", "VCS + Auth")
 
-package "LLM Service 1 - Docker" {
-    [API 1] --> [Model 1]
-    [API 1] --> [Monitoring 1]
+Container(llmService1, "LLM Service1", "Python(Vllm)", "Processes requests and generates responses")
+Container(llmService2, "LLM Service2", "Python(Vllm)", "Processes requests and generates responses")
+
+
+Container_Boundary(back, "api") {
+    Container(gateway, "Gateway API")
+    Container(chat, "Chat API")
+    Container(inline, "Inline API")
+    Container(healthcheck, "healthcheck")
+    Container(logger, "logger")
+    Container(auth, "auth")
 }
-
-package "LLM Service 2 - Docker" {
-    [API 2] --> [Model 2]
-    [API 2] --> [Monitoring 2]
-}
+ContainerDb(database, "Logs Database", "PostgreSQL", "Stores requests and responses")
 
 
-package "Backend- K8s" {
-    [Backend API] --> [Logger] : Накопление логов
 
-    [Backend API] --> [Auth Service] : Авторизация и аунтефикация
-    [Backend API] --> [Chat API] : Запрос к модели через чат
-    [Chat API] --> [API 1]
-    [Backend API] --> [Inline API] : Запрос к модели через редактор
-    [Inline API] --> [API 2]
+dev --> idePlugin
+idePlugin --> gateway
+[gateway] --> [logger] : Накопление логов
+logger --> database
+gateway --> auth 
+auth --> gitlab : Авторизация и аунтефикация
 
-    [Backend API] --> [Health check] : Проверка состояния сервиса
-    [Backend API] --> [Monitoring 1] : Проверка состояния сервиса
-    [Backend API] --> [Monitoring 2] : Проверка состояния сервиса
-}
+[gateway] --> [chat] : Запрос к модели через чат
+[chat] --> [llmService1]
+[gateway] --> [inline] : Запрос к модели через редактор
+[inline] --> [llmService2]
 
-package "IDE - local machine" {
-    [IDE plugin] --> [Backend API] : Отправка запросов
-}
+[gateway] --> [healthcheck] : Проверка состояния сервиса
+[healthcheck] --> [llmService1] : Проверка состояния сервиса
+[healthcheck] --> [llmService2] : Проверка состояния сервиса
+
 
 @enduml
 ```
