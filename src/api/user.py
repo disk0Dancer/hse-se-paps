@@ -7,6 +7,7 @@ from src.dependencies import SessionDep
 
 router = APIRouter()
 
+
 @router.post("/user/", response_model=UserResponse)
 async def create_user(session: SessionDep, user: UserCreate) -> UserResponse:
     db_user = User(**user.dict())
@@ -14,6 +15,7 @@ async def create_user(session: SessionDep, user: UserCreate) -> UserResponse:
     await session.commit()
     await session.refresh(db_user)
     return db_user
+
 
 @router.get("/user/", response_model=List[UserResponse])
 async def read_users(
@@ -26,6 +28,7 @@ async def read_users(
     results = await session.execute(statement)
     users = results.scalars().all()
     return users
+
 
 @router.get("/user/search", response_model=List[UserResponse])
 async def search_users(
@@ -40,6 +43,7 @@ async def search_users(
     users = results.scalars().all()
     return users
 
+
 @router.get("/user/{user_id}", response_model=UserResponse)
 async def read_user(
     user_id: int,
@@ -50,6 +54,7 @@ async def read_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
 
 @router.put("/user/{user_id}", response_model=UserResponse)
 async def update_user(
@@ -74,6 +79,7 @@ async def update_user(
     await session.commit()
     await session.refresh(user)
     return user
+
 
 @router.delete("/user/{user_id}")
 async def delete_user(
