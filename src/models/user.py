@@ -1,32 +1,63 @@
-from typing import Annotated, List, Optional
+from datetime import datetime
+from typing import Optional
+from pydantic import BaseModel, EmailStr, validator
+from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy.orm import relationship
 
-from fastapi import Depends, FastAPI, HTTPException, Query
-from sqlmodel import Field, Session, SQLModel, create_engine, select, Relationship
+from .base import Base
+from .request_log import RequestLog  # Import the RequestLog class
 
+class User(Base):
+    __tablename__ = "users"
 
-class UserBase(SQLModel):
-    login: str = Field(index=True)
-    password: str
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    login = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
+    is_superuser = Column(Boolean, default=False)
 
+    # Relationships
+    access_tokens = relationship(
+        "AccessToken", back_populates="user", cascade="all, delete-orphan"
+    )
+    request_logs = relationship(
+        "RequestLog", back_populates="user", cascade="all, delete-orphan"
+    )
 
-class User(UserBase, table=True):
-    guid: int | None = Field(default=None, primary_key=True)
-    # Establish relationship to AccessToken model
-    access_tokens: List["AccessToken"] = Relationship(back_populates="user")
+# Pydantic models for API
+class UserBase(BaseModel):
+    email: EmailStr
+    login: str
+    is_active: bool = True
+    is_superuser: bool = False
 
-
-class UserPublic(UserBase):
-    guid: int
-
+    class Config:
+        from_attributes = True
 
 class UserCreate(UserBase):
-    pass
+    password: str
 
+    @validator("password")
+    def password_validation(cls, v):
+        if len(v) < 8:
+            raise ValueError("Password must be at least 8 characters long")
+        return v
 
-class UserUpdate(SQLModel):
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
     login: Optional[str] = None
     password: Optional[str] = None
+    is_active: Optional[bool] = None
+    is_superuser: Optional[bool] = None
 
+    class Config:
+        from_attributes = True
+
+class UserResponse(UserBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
 
 def generate_user_token(user):
     return user.login + "token"
