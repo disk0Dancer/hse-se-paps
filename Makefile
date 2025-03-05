@@ -32,7 +32,7 @@ test:
 	PYTHONPATH=src/ uv run pytest
 
 build:
-	PYTHONPATH=src/ uv run uv build src/
+	PYTHONPATH=src/ uv run uv build
 
 build.docker:
 	docker build --platform=linux/amd64 -t backend --output=backend-image .
