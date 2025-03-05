@@ -62,7 +62,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
         with:
-          images: "ghcr.io/disk0Dancer/hse-se-paps/image:latest"
+          images: "ghcr.io/disk0dancer/hse-se-paps/image:latest"
   
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -72,7 +72,7 @@ jobs:
         with:
           context: Dockerfile
           push: true
-          tags: "ghcr.io/disk0Dancer/hse-se-paps/image:latest"
+          tags: "ghcr.io/disk0dancer/hse-se-paps/image:latest"
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
