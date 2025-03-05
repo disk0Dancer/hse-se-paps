@@ -1,14 +1,34 @@
 from datetime import datetime
-from typing import Optional
-from sqlmodel import Field, SQLModel, Relationship
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
+from sqlalchemy.orm import relationship
+from pydantic import BaseModel
+
+from .base import Base
 
 
-class AccessToken(SQLModel, table=True):
-    guid: int | None = Field(default=None, primary_key=True)
-    user_guid: int = Field(foreign_key="user.guid")
-    token: str
-    start_timestamp: datetime
-    end_timestamp: datetime
+class AccessToken(Base):
+    __tablename__ = "access_tokens"
 
-    # Relationship back to User
-    user: Optional["User"] = Relationship(back_populates="access_tokens")
+    id = Column(Integer, primary_key=True)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    token = Column(String, unique=True, index=True, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    is_revoked = Column(Boolean, default=False)
+    user_agent = Column(String, nullable=True)
+    ip_address = Column(String, nullable=True)
+
+    user = relationship("User", back_populates="access_tokens")
+    request_logs = relationship(
+        "RequestLog", back_populates="access_token", cascade="all, delete-orphan"
+    )
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    expires_at: datetime
+
+    class Config:
+        from_attributes = True
