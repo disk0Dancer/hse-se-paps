@@ -5,7 +5,6 @@ from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.orm import relationship
 
 from .base import Base
-from .request_log import RequestLog  # Import the RequestLog class
 
 class User(Base):
     __tablename__ = "users"
@@ -25,6 +24,7 @@ class User(Base):
         "RequestLog", back_populates="user", cascade="all, delete-orphan"
     )
 
+
 # Pydantic models for API
 class UserBase(BaseModel):
     email: EmailStr
@@ -35,6 +35,7 @@ class UserBase(BaseModel):
     class Config:
         from_attributes = True
 
+
 class UserCreate(UserBase):
     password: str
 
@@ -43,6 +44,7 @@ class UserCreate(UserBase):
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters long")
         return v
+
 
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
@@ -54,10 +56,12 @@ class UserUpdate(BaseModel):
     class Config:
         from_attributes = True
 
+
 class UserResponse(UserBase):
     id: int
     created_at: datetime
     updated_at: datetime
+
 
 def generate_user_token(user):
     return user.login + "token"

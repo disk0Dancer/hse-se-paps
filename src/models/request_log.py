@@ -3,6 +3,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from .base import Base
 
+
 class RequestLog(Base):
     __tablename__ = "request_logs"
 

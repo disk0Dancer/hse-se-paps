@@ -21,4 +21,5 @@
 5. Структура проекта - разделение на models, api, services, tests для SoC.
 6. /user endpoints реализуют все CRUD операции.
 7. offset/limit - пагинация для GET /user/.
+8. Создание отдельных контроллеров для completions, chat_completions, user, health_check.
 
