@@ -1,27 +1,29 @@
 import httpx
 from fastapi import APIRouter
 
-from src.services import settings
-
+from src.services.settings import settings
+from src.services.requests_logger import log_request
 
 router = APIRouter(tags=["healthcheck"])
 
 
-@router.get("/")
-async def health_ping():
-    llm_service_response = await httpx.AsyncClient(timeout=1).get(
-        f"{settings.llm_url}/v1/models"
-    )
-    llm_chat_service_response = await httpx.AsyncClient(timeout=1).get(
-        f"{settings.llm_chat_url}/v1/models"
-    )
+@router.get("/health")
+async def health_check(request):
+    """Check health of all dependent services"""
+    health_status = {"llm_service": False, "llm_chat_service": False, "logging": True}
 
-    response = {
-        "backend": "ok",
-        "database": "ok",  # TODO: add database healthcheck
-        "llm_service": "ok" if llm_service_response.status_code == 200 else "failed",
-        "llm_chat_service": "ok"
-        if llm_chat_service_response.status_code == 200
-        else "failed",
-    }
-    return response
+    await log_request(request, extra={"check_type": "health"})
+    async with httpx.AsyncClient() as client:
+        try:
+            llm_resp = await client.get(f"{settings.llm_url}/v1/models")
+            health_status["llm_service"] = llm_resp.status_code == 200
+        except Exception:
+            health_status["llm_service"] = False
+
+        try:
+            chat_resp = await client.get(f"{settings.llm_chat_url}/v1/models")
+            health_status["llm_chat_service"] = chat_resp.status_code == 200
+        except Exception:
+            health_status["llm_chat_service"] = False
+
+    return health_status
