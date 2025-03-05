@@ -181,3 +181,32 @@ auth --> gitlab : Авторизация и аунтефикация
 
 @enduml
 ```
+
+```plantuml
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+left to right direction
+Person(dev, "Developer")
+System_Ext(idePlugin, "IDE Plugin", "React+Kotlin", "Interface for LLM interaction")
+System_Ext(gitlab, "GitLab", "VCS + Auth")
+
+Container(llmService1, "LLM Service1", "Python(Vllm)", "Processes requests and generates responses")
+Container(back, "api")
+ContainerDb(database, "Logs Database", "PostgreSQL", "Stores requests and responses")
+
+Container_Boundary(llmService2_, "LLM Service2", "Python(Vllm)", "Processes requests and generates responses"){
+    Container(completions, "completions")
+    Container(healthcheck, "healthcheck")
+}
+
+dev --> idePlugin
+idePlugin --> back
+back --> gitlab
+back --> database
+back --> llmService1
+[back] --> [completions] :обработка запроса
+[back] --> [healthcheck] : Проверка состояния сервиса
+
+
+@enduml
+```
