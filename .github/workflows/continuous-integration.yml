@@ -40,7 +40,7 @@ jobs:
 
       - name: Start Services
         run: |
-          docker-compose up -d backend postgres
+          docker compose up -d backend postgres
           sleep 10
 
       - name: Run Postman Collection
