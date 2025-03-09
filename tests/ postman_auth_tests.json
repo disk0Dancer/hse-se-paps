@@ -1,0 +1,209 @@
+{
+    "info": {
+        "name": "Auth API Tests",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "API_BASE_URL",
+            "value": "http://0.0.0.0:8000"
+        },
+        {
+            "key": "EMAIL",
+            "value": "testuser@example.com"
+        },
+        {
+            "key": "LOGIN",
+            "value": "testuser"
+        },
+        {
+            "key": "PASSWORD",
+            "value": "password123456"
+        },
+        {
+            "key": "ACCESS_TOKEN",
+            "value": ""
+        },
+        {
+            "key": "REFRESH_TOKEN",
+            "value": ""
+        },
+        {
+            "key": "USER_GUID",
+            "value": ""
+        }
+    ],
+    "item": [
+        {
+            "name": "Register User",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": "{{API_BASE_URL}}/register",
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"email\":\"{{EMAIL}}\",\"login\":\"{{LOGIN}}\",\"password\":\"{{PASSWORD}}\"}"
+                }
+            }
+        },
+        {
+            "name": "Login User",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": "{{API_BASE_URL}}/login",
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"login\":\"{{LOGIN}}\",\"password\":\"{{PASSWORD}}\"}"
+                }
+            }
+        },
+        {
+            "name": "Access Protected Endpoint",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{ACCESS_TOKEN}}"
+                    }
+                ],
+                "url": "{{API_BASE_URL}}/protected"
+            }
+        },
+        {
+            "name": "Refresh Token",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": "{{API_BASE_URL}}/refresh",
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"refresh_token\":\"{{REFRESH_TOKEN}}\"}"
+                }
+            }
+        },
+        {
+            "name": "Invalid Login",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": "{{API_BASE_URL}}/login",
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"login\":\"invalid_user\",\"password\":\"wrong_password\"}"
+                }
+            }
+        },
+        {
+            "name": "Logout User",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{ACCESS_TOKEN}}"
+                    }
+                ],
+                "url": "{{API_BASE_URL}}/logout"
+            }
+        },
+        {
+            "name": "Access Protected After Logout",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{ACCESS_TOKEN}}"
+                    }
+                ],
+                "url": "{{API_BASE_URL}}/protected"
+            }
+        },
+        {
+            "name": "Request Password Reset",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": "{{API_BASE_URL}}/reset-password",
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"email\":\"{{EMAIL}}\"}"
+                }
+            }
+        },
+        {
+            "name": "Register with Existing Email",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": "{{API_BASE_URL}}/register",
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"email\":\"{{EMAIL}}\",\"login\":\"newuser\",\"password\":\"password123\"}"
+                }
+            }
+        },
+        {
+            "name": "Invalid Token Refresh",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": "{{API_BASE_URL}}/refresh",
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"refresh_token\":\"invalid_token\"}"
+                }
+            }
+        },
+        {
+            "name": "Delete User Account",
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{ACCESS_TOKEN}}"
+                    }
+                ],
+                "url": "{{API_BASE_URL}}/user/{{USER_GUID}}"
+            }
+        }
+    ]
+}
