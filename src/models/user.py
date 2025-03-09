@@ -21,9 +21,14 @@ class User(Base):
     access_tokens = relationship(
         "AccessToken", back_populates="user", cascade="all, delete-orphan"
     )
-    request_logs = relationship(
-        "RequestLog", back_populates="user", cascade="all, delete-orphan"
-    )
+
+    @property
+    def password(self):
+        return self.hashed_password
+
+    @password.setter
+    def password(self, value):
+        self.hashed_password = hash(value)
 
 
 # Pydantic models for API

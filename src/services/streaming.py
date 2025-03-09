@@ -4,7 +4,6 @@ from fastapi import HTTPException
 from starlette.responses import StreamingResponse
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from typing import AsyncGenerator, Dict, Any
-from .requests_logger import logger_adapter
 
 
 async def log_stream_chunk(chunk: bytes, extra: Dict[str, Any] = None) -> None:
@@ -13,7 +12,6 @@ async def log_stream_chunk(chunk: bytes, extra: Dict[str, Any] = None) -> None:
         message = f"Stream chunk: {len(chunk)} bytes"
         if extra:
             message += f" - {str(extra)}"
-        await logger_adapter.log_message(message)
     except Exception as e:
         # Log errors but don't break streaming
         print(f"Logging error: {str(e)}")

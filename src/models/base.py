@@ -8,8 +8,8 @@ from sqlalchemy import Column, DateTime
 
 from src.services.settings import settings
 
-
-engine = create_async_engine(settings.pg_dsn, echo=True, future=True)
+url = "postgresql+asyncpg://postgres:postgres@127.0.0.1:5432/postgres"
+engine = create_async_engine(url, echo=True, future=True)
 
 
 async_session_factory = async_sessionmaker(
