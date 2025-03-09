@@ -5,7 +5,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status, Body
 from fastapi.security import OAuth2PasswordRequestForm
 
-from src.models.user import User, UserResponse
+from src.models.user import User
 from src.services.auth import AuthService, Token
 from src.models.access_token import AccessToken
 from src.dependencies import SessionDep
@@ -147,8 +147,3 @@ async def revoke_token(
         return {"message": "Token successfully revoked"}
 
     return {"message": "Token not found"}
-
-
-@router.get("/users/me", response_model=UserResponse)
-async def read_users_me(current_user: User = Depends(AuthService.get_current_user)):
-    return current_user
