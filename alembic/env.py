@@ -9,10 +9,12 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from alembic import context
 
-# Add the parent directory to the path so that 'src' can be found
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.models.base import Base
+from src.models.access_token import AccessToken  # noqa: F401
+from src.models.user import User  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:
