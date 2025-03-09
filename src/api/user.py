@@ -1,16 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from typing import Annotated, List
+from typing import Annotated, Optional, List
 from sqlmodel import select
 from src.models.user import User, UserCreate, UserUpdate, UserResponse
 from src.services.auth import AuthService
 from src.dependencies import SessionDep
+import uuid
 
 router = APIRouter()
 
 
 @router.post("/", response_model=UserResponse)
 async def create_user(session: SessionDep, user: UserCreate) -> UserResponse:
-    db_user = User(**user.dict())
+    user_dict = user.dict()
+    user_dict["guid"] = str(uuid.uuid4())  # Generate a unique GUID
+    db_user = User(**user_dict)
     session.add(db_user)
     await session.commit()
     await session.refresh(db_user)
@@ -30,26 +33,30 @@ async def read_users(
     return users
 
 
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/{user_guid}", response_model=UserResponse)
 async def read_user(
-    user_id: int,
+    user_guid: str,
     session: SessionDep,
     current_user: User = Depends(AuthService.get_current_user),  # Protected route
 ) -> UserResponse:
-    user = await session.get(User, user_id)
+    statement = select(User).where(User.guid == user_guid)
+    results = await session.execute(statement)
+    user = results.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
 
-@router.put("/{user_id}", response_model=UserResponse)
+@router.put("/{user_guid}", response_model=UserResponse)
 async def update_user(
-    user_id: int,
+    user_guid: str,
     user_update: UserUpdate,
     session: SessionDep,
     current_user: User = Depends(AuthService.get_current_user),  # Protected route
 ) -> UserResponse:
-    user = await session.get(User, user_id)
+    statement = select(User).where(User.guid == user_guid)
+    results = await session.execute(statement)
+    user = results.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -67,13 +74,15 @@ async def update_user(
     return user
 
 
-@router.delete("/{user_id}")
+@router.delete("/{user_guid}")
 async def delete_user(
-    user_id: int,
+    user_guid: str,
     session: SessionDep,
     current_user: User = Depends(AuthService.get_current_user),  # Protected route
 ):
-    user = await session.get(User, user_id)
+    statement = select(User).where(User.guid == user_guid)
+    results = await session.execute(statement)
+    user = results.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 

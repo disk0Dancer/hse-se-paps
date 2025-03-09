@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, EmailStr, validator
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, String, Boolean
 from sqlalchemy.orm import relationship
+import uuid
 
 from .base import Base
 
@@ -10,7 +11,7 @@ from .base import Base
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    guid = Column(String(36), primary_key=True, unique=True, index=True, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     login = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
@@ -28,7 +29,10 @@ class User(Base):
 
     @password.setter
     def password(self, value):
-        self.hashed_password = hash(value)
+        self.hashed_password = str(hash(value))
+
+    def validate_password(self, password: str) -> bool:
+        return str(hash(password)) == self.hashed_password
 
 
 # Pydantic models for API
@@ -64,10 +68,6 @@ class UserUpdate(BaseModel):
 
 
 class UserResponse(UserBase):
-    id: int
+    guid: str
     created_at: datetime
     updated_at: datetime
-
-
-def generate_user_token(user):
-    return user.login + "token"
