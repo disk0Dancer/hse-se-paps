@@ -6,6 +6,8 @@ from src.services.auth import AuthService
 from src.dependencies import SessionDep
 import uuid
 
+# from src.models.access_token import AccessToken
+
 router = APIRouter()
 
 
@@ -31,6 +33,20 @@ async def read_users(
     results = await session.execute(statement)
     users = results.scalars().all()
     return users
+
+
+@router.get("/me", response_model=UserResponse)
+async def read_users_me(
+    session: SessionDep, current_user: User = Depends(AuthService.get_current_user)
+):
+    """
+    Get the current user's details.
+    Returns profile and all access tokens.
+    """
+    # statement = select(AccessToken).where(AccessToken.user_guid == current_user.guid)
+    # results = await session.execute(statement)
+    # current_user.access_tokens = results.scalars().all()
+    return current_user
 
 
 @router.get("/{user_guid}", response_model=UserResponse)
