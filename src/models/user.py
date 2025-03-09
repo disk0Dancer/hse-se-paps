@@ -3,7 +3,6 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, validator
 from sqlalchemy import Column, String, Boolean
 from sqlalchemy.orm import relationship
-import uuid
 from passlib.context import CryptContext
 
 from .base import Base
@@ -34,8 +33,8 @@ class User(Base):
     def password(self, value):
         self.hashed_password = pwd_context.hash(value)
 
-    def validate_password(self, password: str) -> bool:
-        return str(hash(password)) == self.hashed_password
+    def validate_password(self, value: str) -> bool:
+        return pwd_context.verify(value, self.hashed_password)
 
 
 # Pydantic models for API

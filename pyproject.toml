@@ -1,7 +1,7 @@
 [project]
-name = "labwork4"
+name = "labworks"
 version = "0.1.0"
-description = "api implementation"
+description = "api implementation for software architecture course"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -19,8 +19,9 @@ dependencies = [
     "alembic>=1.13.1",
     "python-dotenv>=1.0.1",
     "python-multipart>=0.0.20",
-    "psycopg2[async]>=2.9.10",
+    "psycopg2>=2.9.10",
     "passlib[bcrypt]>=1.7.4",
+    "bcrypt>=4.3.0",
 ]
 
 [dependency-groups]
