@@ -1,2 +1,2 @@
-def dumb_test():
+def test_dumb():
     assert 1 == 2 - 1
