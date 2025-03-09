@@ -7,6 +7,7 @@ FROM python:${PYTHON_VERSION}-slim AS base
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+RUN apt-get update && apt-get install -y libpq-dev gcc
 COPY --from=uv /uv /uvx /bin/
 WORKDIR /app
 
