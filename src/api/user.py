@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from typing import Annotated, Optional, List
+from typing import Annotated, List
 from sqlmodel import select
 from src.models.user import User, UserCreate, UserUpdate, UserResponse
 from src.services.auth import AuthService
