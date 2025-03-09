@@ -45,4 +45,4 @@ jobs:
 
       - name: Run Postman Collection
         run: |
-          newman run tests/postman_auth_tests.json
+          newman run $(pwd)/tests/postman_auth_tests.json
