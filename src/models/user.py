@@ -3,7 +3,6 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, validator
 from sqlalchemy import Column, String, Boolean
 from sqlalchemy.orm import relationship
-import uuid
 
 from .base import Base
 

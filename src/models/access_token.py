@@ -2,7 +2,6 @@ from datetime import datetime
 from sqlalchemy import Column, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel
-import uuid
 
 from .base import Base
 
