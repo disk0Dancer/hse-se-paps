@@ -9,8 +9,7 @@ from src.api.healthcheck import router as healthcheck_router
 from src.api.user import router as user_router
 from src.api.auth import router as auth_router
 
-from src.services import settings
-from src.services.requests_logger import log_request, start_logger, stop_logger
+from src.services.settings import settings
 
 
 class Application:
@@ -37,36 +36,21 @@ class Application:
                 allow_headers=["*"],
             )
 
-            # Middleware as Interceptor Pattern
-            @app.middleware("http")
-            async def auth_middleware(request: Request, call_next):
-                # implement
-                response = await call_next(request)
-                return response
-
             # Observer Pattern
             @app.middleware("http")
             async def request_logger_middleware(request: Request, call_next):
-                await log_request(request)
                 response = await call_next(request)
                 return response
 
-            # Application Lifecycle Hooks
             @app.on_event("startup")
             async def on_startup():
                 logger.info(f"Settings: {settings.__dict__}")
 
-                await start_logger()
                 logger.info("Available endpoints:")
                 for route in app.routes:
                     logger.info(f"\t{route.path}\tMethods={route.methods}")
 
-            @app.on_event("shutdown")
-            async def on_shutdown():
-                await stop_logger()
-
             cls._instance.app = app
-
         return cls._instance
 
 

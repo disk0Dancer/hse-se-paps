@@ -20,9 +20,6 @@ class AccessToken(Base):
     ip_address = Column(String, nullable=True)
 
     user = relationship("User", back_populates="access_tokens")
-    request_logs = relationship(
-        "RequestLog", back_populates="access_token", cascade="all, delete-orphan"
-    )
 
 
 class TokenResponse(BaseModel):

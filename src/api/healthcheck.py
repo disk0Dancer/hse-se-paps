@@ -2,7 +2,6 @@ import httpx
 from fastapi import APIRouter
 
 from src.services.settings import settings
-from src.services.requests_logger import log_request
 
 router = APIRouter(tags=["healthcheck"])
 
@@ -12,7 +11,6 @@ async def health_check(request):
     """Check health of all dependent services"""
     health_status = {"llm_service": False, "llm_chat_service": False, "logging": True}
 
-    await log_request(request, extra={"check_type": "health"})
     async with httpx.AsyncClient() as client:
         try:
             llm_resp = await client.get(f"{settings.llm_url}/v1/models")

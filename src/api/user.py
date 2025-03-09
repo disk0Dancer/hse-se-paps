@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from typing import Annotated, Optional, List
+from typing import Annotated, List
 from sqlmodel import select
 from src.models.user import User, UserCreate, UserUpdate, UserResponse
 from src.services.auth import AuthService
@@ -8,7 +8,7 @@ from src.dependencies import SessionDep
 router = APIRouter()
 
 
-@router.post("/user/", response_model=UserResponse)
+@router.post("/", response_model=UserResponse)
 async def create_user(session: SessionDep, user: UserCreate) -> UserResponse:
     db_user = User(**user.dict())
     session.add(db_user)
@@ -17,7 +17,7 @@ async def create_user(session: SessionDep, user: UserCreate) -> UserResponse:
     return db_user
 
 
-@router.get("/user/", response_model=List[UserResponse])
+@router.get("/", response_model=List[UserResponse])
 async def read_users(
     session: SessionDep,
     current_user: User = Depends(AuthService.get_current_user),  # Protected route
@@ -30,21 +30,7 @@ async def read_users(
     return users
 
 
-@router.get("/user/search", response_model=List[UserResponse])
-async def search_users(
-    session: SessionDep,
-    login: Optional[str] = None,
-    current_user: User = Depends(AuthService.get_current_user),  # Protected route
-) -> List[UserResponse]:
-    if not login:
-        return []
-    statement = select(User).where(User.login.contains(login))
-    results = await session.execute(statement)
-    users = results.scalars().all()
-    return users
-
-
-@router.get("/user/{user_id}", response_model=UserResponse)
+@router.get("/{user_id}", response_model=UserResponse)
 async def read_user(
     user_id: int,
     session: SessionDep,
@@ -56,7 +42,7 @@ async def read_user(
     return user
 
 
-@router.put("/user/{user_id}", response_model=UserResponse)
+@router.put("/{user_id}", response_model=UserResponse)
 async def update_user(
     user_id: int,
     user_update: UserUpdate,
@@ -81,7 +67,7 @@ async def update_user(
     return user
 
 
-@router.delete("/user/{user_id}")
+@router.delete("/{user_id}")
 async def delete_user(
     user_id: int,
     session: SessionDep,

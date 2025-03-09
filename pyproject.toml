@@ -19,6 +19,7 @@ dependencies = [
     "alembic>=1.13.1",
     "python-dotenv>=1.0.1",
     "python-multipart>=0.0.20",
+    "psycopg2[async]>=2.9.10",
 ]
 
 [dependency-groups]
