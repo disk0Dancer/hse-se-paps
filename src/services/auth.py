@@ -8,11 +8,11 @@ from sqlmodel import select
 
 from src.models.user import User
 from src.dependencies import SessionDep
+from src.services.settings import settings
 
-# Secret key for JWT signing - in production, store this in environment variables
-SECRET_KEY = "your-secret-key-here"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = settings.secret_key
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
