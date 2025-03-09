@@ -29,3 +29,20 @@ jobs:
 
       - name: Build the project
         run: make build
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Start Services
+        run: |
+          docker-compose up -d
+          sleep 10
+
+      - name: Run Postman Collection
+        run: |
+          newman run tests/postman_auth_tests.json
