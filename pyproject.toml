@@ -20,6 +20,7 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "python-multipart>=0.0.20",
     "psycopg2[async]>=2.9.10",
+    "passlib[bcrypt]>=1.7.4",
 ]
 
 [dependency-groups]

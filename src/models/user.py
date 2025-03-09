@@ -3,8 +3,12 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, validator
 from sqlalchemy import Column, String, Boolean
 from sqlalchemy.orm import relationship
+import uuid
+from passlib.context import CryptContext
 
 from .base import Base
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class User(Base):
@@ -24,11 +28,11 @@ class User(Base):
 
     @property
     def password(self):
-        return self.hashed_password
+        raise AttributeError("password is not a readable attribute")
 
     @password.setter
     def password(self, value):
-        self.hashed_password = str(hash(value))
+        self.hashed_password = pwd_context.hash(value)
 
     def validate_password(self, password: str) -> bool:
         return str(hash(password)) == self.hashed_password

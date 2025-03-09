@@ -14,8 +14,11 @@ class AccessToken(Base):
         String(36), ForeignKey("users.guid", ondelete="CASCADE"), nullable=False
     )
     token = Column(String, unique=True, index=True, nullable=False)
+    refresh_token = Column(String, unique=True, index=True, nullable=True)
     start_timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
     end_timestamp = Column(DateTime, nullable=False)
+    refresh_end_timestamp = Column(DateTime, nullable=True)
+    token_type = Column(String, default="bearer")
     is_revoked = Column(Boolean, default=False)
     user_agent = Column(String, nullable=True)
     ip_address = Column(String, nullable=True)
@@ -27,6 +30,7 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     expires_at: datetime
+    refresh_token: str = None
 
     class Config:
         from_attributes = True
