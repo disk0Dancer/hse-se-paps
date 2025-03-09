@@ -1,11 +1,10 @@
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 import jwt
-from fastapi import Depends, HTTPException, status, Request
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from sqlmodel import select
-from starlette.requests import Request as StarletteRequest
 
 from src.models.user import User
 from src.models.access_token import AccessToken
@@ -94,7 +93,7 @@ class AuthService:
 
         # Check if token is revoked
         token_stmt = select(AccessToken).where(
-            AccessToken.token == token, AccessToken.is_revoked == True
+            AccessToken.token == token, AccessToken.is_revoked is True
         )
         result = await session.execute(token_stmt)
         if result.scalar_one_or_none() is not None:

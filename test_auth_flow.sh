@@ -6,7 +6,7 @@
 
 set -e
 API_BASE_URL="http://localhost:8000"
-EMAIL="test@example.com"
+EMAIL="test$(date +%s)@example.com"
 LOGIN="testuser$(date +%s)"
 PASSWORD="password123456"
 AUTH_TOKEN=""
@@ -17,10 +17,9 @@ echo "Starting authentication flow test..."
 
 # Step 1: Register a new user
 echo "1. Registering a new user: $LOGIN"
-REGISTER_RESPONSE=$(curl -s -X POST "$API_BASE_URL/user/user/" \
+REGISTER_RESPONSE=$(curl -s -X POST "$API_BASE_URL/user/" \
   -H "Content-Type: application/json" \
   -d "{\"email\":\"$EMAIL\",\"login\":\"$LOGIN\",\"password\":\"$PASSWORD\"}")
-echo "Registration response:\n{$REGISTER_RESPONSE}"
 
 # Extract the user GUID from the response
 USER_GUID=$(echo $REGISTER_RESPONSE | grep -o '"guid":"[^"]*' | sed 's/"guid":"//')
@@ -61,7 +60,7 @@ echo $PROFILE_RESPONSE | python3 -m json.tool
 
 # Step 4: Try to access user's data using the token
 echo "4. Accessing user data by GUID"
-USER_RESPONSE=$(curl -s -X GET "$API_BASE_URL/user/user/$USER_GUID" \
+USER_RESPONSE=$(curl -s -X GET "$API_BASE_URL/user/$USER_GUID" \
   -H "Authorization: Bearer $AUTH_TOKEN")
 
 echo "User data response:"
