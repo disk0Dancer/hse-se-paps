@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -36,9 +36,11 @@ class TokenFactory:
         """Factory method to create JWT access tokens"""
         to_encode = data.copy()
         if expires_delta:
-            expire = datetime.utcnow() + expires_delta
+            expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+            expire = datetime.now(timezone.utc) + timedelta(
+                minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+            )
         to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt, expire  # Return both the token and expiration time
@@ -48,7 +50,7 @@ class TokenFactory:
         """Create a refresh token with a longer expiration time"""
         to_encode = data.copy()
         # Refresh tokens typically last longer than access tokens
-        refresh_expires = datetime.utcnow() + timedelta(days=7)  # 7 days
+        refresh_expires = datetime.now(timezone.utc) + timedelta(days=7)  # 7 days
         to_encode.update({"exp": refresh_expires, "refresh": True})
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt, refresh_expires
