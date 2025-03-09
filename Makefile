@@ -1,4 +1,4 @@
-.PHONY: install dev run lint lint.fix typing fmt fmt.check test build build.docker
+.PHONY: install dev run lint lint.fix typing fmt fmt.check test build build.docker db.init db.migrate db.upgrade db.downgrade db.history
 
 install:
 	@echo "installing UV"
@@ -36,3 +36,24 @@ build:
 
 build.docker:
 	docker build --platform=linux/amd64 -t backend --output=backend-image .
+
+# Database migration commands
+db.init:
+	@echo "Initializing alembic"
+	PYTHONPATH=. alembic init alembic
+
+db.migrate:
+	@echo "Creating migration"
+	PYTHONPATH=. alembic revision --autogenerate -m "$(message)"
+
+db.upgrade:
+	@echo "Upgrading database to latest version"
+	PYTHONPATH=. alembic upgrade head
+
+db.downgrade:
+	@echo "Downgrading database by one version"
+	PYTHONPATH=. alembic downgrade -1
+
+db.history:
+	@echo "Showing migration history"
+	PYTHONPATH=. alembic history --verbose
