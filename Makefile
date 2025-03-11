@@ -6,6 +6,8 @@ install:
 	@echo "installing dependencies"
 	uv venv
 	uv sync
+	mkdir tools
+	git clone vllm
 
 dev:
 	PYTHONPATH=src/ uv run uvicorn 'src.app:app' --host=0.0.0.0 --port=8000 --reload

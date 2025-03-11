@@ -4,7 +4,7 @@ services:
         image: postgres
         environment:
             POSTGRES_USER: ${POSTGRES_USER:-postgres}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
             PGDATA: /data/postgres
         volumes:
             - postgres:/data/postgres
@@ -32,13 +32,20 @@ services:
             driver: "none"
     
     llm-chat:
-        image: vllm/vllm-openai:latest
+        # build:
+        #     context: /Users/g.churakov/Desktop/hse-se-paps/tools/vllm/
+        #     dockerfile: Dockerfile.arm
         # restart: unless-stopped
+        image: hse-se-paps-vllm-arm:latest
+        pull_policy: never
         volumes:
             - ~/.cache/huggingface:/root/.cache/huggingface
         entrypoint: python3
-        command: -m vllm.entrypoints.openai.api_server --port=5000 --host=0.0.0.0 --model ${MODEL_CHECKPOINT:-Qwen/Qwen2.5-Coder-0.5B-Instruct} --device auto
+        command: -m vllm.entrypoints.openai.api_server --port=5000 --host=0.0.0.0 --model Qwen/Qwen2.5-Coder-0.5B-Instruct --dtype float16  --device cpu --disable-async-output-proc --swap-space 2 --uvicorn-log-level debug --enforce-eager --worker-cls "vllm.worker.cpu_worker.CPUWorker"
         environment:
+            - VLLM_TARGET_DEVICE=cpu
+            - HF_HUB_OFFLINE=1
+            - TRANSFORMERS_OFFLINE=1
             - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN:-token}
         ports:
             - "5002:5000"
@@ -51,13 +58,19 @@ services:
             - llm-chat
 
     llm-completion:
-        image: vllm/vllm-openai:latest
+        # build:
+        #     context: /Users/g.churakov/Desktop/hse-se-paps/tools/vllm/
+        #     dockerfile: Dockerfile.arm
         # restart: unless-stopped
+        image: hse-se-paps-vllm-arm:latest
+        pull_policy: never
         volumes:
             - ~/.cache/huggingface:/root/.cache/huggingface
         entrypoint: python3
-        command: -m vllm.entrypoints.openai.api_server --port=5000 --host=0.0.0.0 --model ${MODEL_CHECKPOINT:-Qwen/Qwen2.5-Coder-0.5B} --device auto
+        command: -m vllm.entrypoints.openai.api_server --port=5000 --host=0.0.0.0 --model Qwen/Qwen2.5-Coder-0.5B-Instruct --dtype float16  --device cpu --disable-async-output-proc --swap-space 2 --uvicorn-log-level debug --enforce-eager --worker-cls "vllm.worker.cpu_worker.CPUWorker"
         environment:
+            - HF_HUB_OFFLINE=1
+            - TRANSFORMERS_OFFLINE=1
             - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN:-token}
         ports:
             - "5001:5000"
@@ -75,11 +88,9 @@ services:
         ports:
             - 8000:8000
         environment:
-            - POSTGRES_USER=${POSTGRES_USER:-postgres}
-            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
-            - POSTGRES_HOST=postgres
-            - POSTGRES_PORT=5432
-            - POSTGRES_DB=${POSTGRES_DB:-postgres}
+            - LLM_URL=http://0.0.0.0:5001
+            - LLM_CHAT_URL=http://0.0.0.0:5002
+            - POSTGRES_CONN_URL=postgresql+asyncpg://postgres:postgres@127.0.0.1:5432/postgres
         develop:
             watch:
                 -   action: sync
