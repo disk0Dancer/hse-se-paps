@@ -1,4 +1,4 @@
-.PHONY: install dev run lint lint.fix typing fmt fmt.check test build build.docker db.init db.migrate db.upgrade db.downgrade db.history
+.PHONY: install dev run lint lint.fix typing fmt fmt.check test build build.docker db.init db.migrate db.upgrade db.downgrade db.history test.postman
 
 install:
 	@echo "installing UV"
@@ -57,3 +57,8 @@ db.downgrade:
 db.history:
 	@echo "Showing migration history"
 	PYTHONPATH=. alembic history --verbose
+
+test.postman:
+	@echo "Running Postman tests"
+	@command -v newman >/dev/null 2>&1 || { echo "Newman is required. Installing..."; npm install -g newman; }
+	newman run tests/postman_auth_tests.json
