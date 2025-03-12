@@ -13,6 +13,7 @@ def test_create_token(mock_user):
     assert token is not None
     assert token.access_token is not None
     assert token.refresh_token is not None
+    assert 1 == 1
 
 
 def test_verify_token(mock_user):
