@@ -2,7 +2,7 @@ from src.services.auth import AuthService
 from src.models.user import User
 
 
-def test_create_token():
+def test_create_token(mock_env):
     user = User(email="test@example.com", login="testuser", password="password123")
     token = AuthService.create_token(user)
     assert token is not None
@@ -10,7 +10,7 @@ def test_create_token():
     assert token.refresh_token is not None
 
 
-def test_verify_token():
+def test_verify_token(mock_env):
     user = User(email="test@example.com", login="testuser", password="password123")
     token = AuthService.create_token(user)
     payload = AuthService.verify_token(token.access_token)
@@ -18,7 +18,7 @@ def test_verify_token():
     assert payload["sub"] == user.login
 
 
-def test_token_expiration():
+def test_token_expiration(mock_env):
     user = User(email="test@example.com", login="testuser", password="password123")
     token = AuthService.create_token(user)
     assert token.expires_at is not None
