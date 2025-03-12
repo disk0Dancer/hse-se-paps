@@ -25,7 +25,6 @@ async def create_user(session: SessionDep, user: UserCreate) -> UserResponse:
 @router.get("/", response_model=List[UserResponse])
 async def read_users(
     session: SessionDep,
-    current_user: User = Depends(AuthService.get_current_user),  # Protected route
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
 ) -> List[UserResponse]:

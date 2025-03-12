@@ -105,6 +105,7 @@ class AuthService:
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
+        # Use timezone-naive datetime for consistency with database
         token_stmt = select(AccessToken).where(
             AccessToken.token == token, AccessToken.end_timestamp < datetime.utcnow()
         )
@@ -131,14 +132,24 @@ class AuthService:
         access_token, expires_at = TokenFactory.create_access_token(
             data={"sub": user.login}, expires_delta=access_token_expires
         )
-        refresh_token, _ = TokenFactory.create_refresh_token(data={"sub": user.login})
+        refresh_token, refresh_expires_at = TokenFactory.create_refresh_token(
+            data={"sub": user.login}
+        )
 
+        # For the response, we can use timezone-aware datetimes
         return Token(
             access_token=access_token,
             token_type="bearer",
             expires_at=expires_at,
             refresh_token=refresh_token,
         )
+
+    @staticmethod
+    def get_db_compatible_datetime(dt: datetime) -> datetime:
+        """Convert a timezone-aware datetime to a timezone-naive one for database storage"""
+        if dt.tzinfo is not None:
+            return dt.replace(tzinfo=None)
+        return dt
 
     @staticmethod
     def get_token_from_request() -> str:
