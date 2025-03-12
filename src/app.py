@@ -10,6 +10,7 @@ from src.api.user import router as user_router
 from src.api.auth import router as auth_router
 
 from src.services.settings import settings
+from src.models.base import engine, Base
 
 
 class Application:
@@ -45,6 +46,26 @@ class Application:
             @app.on_event("startup")
             async def on_startup():
                 logger.info(f"Settings: {settings.__dict__}")
+                # Add specific logging for the Postgres DSN (with password masked)
+                pg_dsn = settings.pg_dsn
+                masked_dsn = (
+                    pg_dsn.replace("postgres:postgres", "postgres:****")
+                    if pg_dsn
+                    else "Not set"
+                )
+                logger.info(f"Using PostgreSQL connection string: {masked_dsn}")
+
+                # Create all database tables if they don't exist
+                logger.info("Creating database tables if they don't exist...")
+                try:
+                    async with engine.begin() as conn:
+                        # Drop all tables for complete reset - uncomment only if needed
+                        # await conn.run_sync(Base.metadata.drop_all)
+                        await conn.run_sync(Base.metadata.create_all)
+                    logger.info("Database tables created successfully.")
+                except Exception as e:
+                    logger.error(f"Error creating database tables: {str(e)}")
+                    logger.error("Please check your database connection settings.")
 
                 logger.info("Available endpoints:")
                 for route in app.routes:

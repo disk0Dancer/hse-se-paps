@@ -7,7 +7,7 @@ router = APIRouter(tags=["healthcheck"])
 
 
 @router.get("/health")
-async def health_check(request):
+async def health_check():
     """Check health of all dependent services"""
     health_status = {"llm_service": False, "llm_chat_service": False, "logging": True}
 

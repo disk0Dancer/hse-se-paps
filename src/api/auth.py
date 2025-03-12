@@ -29,13 +29,15 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
     token = AuthService.create_token(user)
+
+    # Convert timezone-aware datetimes to timezone-naive for database storage
     db_token = AccessToken(
         guid=str(uuid.uuid4()),
         user_guid=user.guid,
         token=token.access_token,
         refresh_token=token.refresh_token,
         start_timestamp=datetime.utcnow(),
-        end_timestamp=token.expires_at,
+        end_timestamp=AuthService.get_db_compatible_datetime(token.expires_at),
         refresh_end_timestamp=datetime.utcnow() + timedelta(days=7),  # 7 days
     )
     session.add(db_token)
@@ -107,13 +109,14 @@ async def refresh_access_token(
             if result.scalar_one_or_none() is None:
                 break
 
+        # Convert timezone-aware datetimes to timezone-naive for database storage
         new_db_token = AccessToken(
             guid=str(uuid.uuid4()),
             user_guid=user.guid,
             token=new_token.access_token,
             refresh_token=new_token.refresh_token,
             start_timestamp=datetime.utcnow(),
-            end_timestamp=new_token.expires_at,
+            end_timestamp=AuthService.get_db_compatible_datetime(new_token.expires_at),
             refresh_end_timestamp=datetime.utcnow() + timedelta(days=7),  # 7 days
         )
         session.add(new_db_token)

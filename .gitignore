@@ -89,3 +89,4 @@ celerybeat.pid
 **/cython_debug/
 
 **/.idea/
+/tools/
