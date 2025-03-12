@@ -1,5 +1,18 @@
+import os
+import pytest
+
 from src.services.auth import AuthService
 from src.models.user import User
+
+
+@pytest.fixture(
+    scope="session",
+    autouse=True,
+)
+def mock_env():
+    os.environ["LLM_URL"] = "http://mock-llm-url.com"
+    os.environ["LLM_CHAT_URL"] = "http://mock-llm-chat-url.com"
+    os.environ["POSTGRES_CONN_URL"] = "postgresql://user:password@localhost/dbname"
 
 
 def test_create_token():
