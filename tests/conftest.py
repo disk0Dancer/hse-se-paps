@@ -1,4 +1,3 @@
-import os
 import pytest
 
 
@@ -6,7 +5,11 @@ import pytest
     scope="session",
     autouse=True,
 )
-def mock_env():
-    os.environ["LLM_URL"] = "http://mock-llm-url.com"
-    os.environ["LLM_CHAT_URL"] = "http://mock-llm-chat-url.com"
-    os.environ["POSTGRES_CONN_URL"] = "postgresql://user:password@localhost/dbname"
+def mock_user():
+    class User:
+        def __init__(self, email, login, password):
+            self.email = email
+            self.login = login
+            self.password = password
+
+    return User(email="test@example.com", login="testuser", password="password123")
