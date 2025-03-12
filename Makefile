@@ -33,6 +33,9 @@ fmt.check:
 test:
 	PYTHONPATH=src/ uv run pytest
 
+test.api:
+	newman run $(pwd)/tests/postman_auth_tests.json
+
 build:
 	PYTHONPATH=src/ uv run uv build
 
