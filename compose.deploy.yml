@@ -32,7 +32,7 @@ services:
             driver: "none"
     
     llm-chat:
-        image: disk0dancer/vllm-arm:latest
+        image: disk0dancer/vllm-arm:0.7.3
         volumes:
             - ~/.cache/huggingface:/root/.cache/huggingface
         entrypoint: python3
@@ -53,7 +53,7 @@ services:
             - llm-chat
 
     llm-completion:
-        image: disk0dancer/vllm-arm:latest
+        image: disk0dancer/vllm-arm:0.7.3
         volumes:
             - ~/.cache/huggingface:/root/.cache/huggingface
         entrypoint: python3
@@ -73,8 +73,7 @@ services:
             - llm-completion
 
     backend:
-        build:
-            context: .
+        image: disk0dancer/copilot-api:latest
         ports:
             - 8000:8000
         environment:
@@ -86,13 +85,6 @@ services:
             interval: 30s
             timeout: 5s
             retries: 20
-        develop:
-            watch:
-                -   action: sync
-                    path: /src
-                    target: /app
-                -   action: rebuild
-                    path: ./pyproject.toml
         networks:
             - postgres
             - llm-chat
