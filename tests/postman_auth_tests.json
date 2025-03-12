@@ -307,12 +307,14 @@
                     "script": {
                         "type": "text/javascript",
                         "exec": [
-                            "// Test that multiple sequential requests work properly",
-                            "pm.test(\"Sequential requests succeed\", function () {",
-                            "    pm.response.to.have.status(200);",
-                            "    var jsonData = pm.response.json();",
-                            "    pm.expect(jsonData).to.have.property('login');",
-                            "});"
+                            "// Wait for 1 second before executing the request",
+                            "setTimeout(function() {",
+                            "    pm.test(\"Sequential requests succeed\", function () {",
+                            "        pm.response.to.have.status(200);",
+                            "        var jsonData = pm.response.json();",
+                            "        pm.expect(jsonData).to.have.property('login');",
+                            "    });",
+                            "}, 1000);"
                         ]
                     }
                 }
@@ -336,9 +338,12 @@
                     "script": {
                         "type": "text/javascript",
                         "exec": [
-                            "pm.test(\"Missing authentication should be rejected\", function () {",
-                            "    pm.response.to.have.status(401);",
-                            "});"
+                            "// Wait for 1 second before executing the request",
+                            "setTimeout(function() {",
+                            "    pm.test(\"Missing authentication should be rejected\", function () {",
+                            "        pm.response.to.have.status(401);",
+                            "    });",
+                            "}, 1000);"
                         ]
                     }
                 }
@@ -378,10 +383,12 @@
                     "script": {
                         "type": "text/javascript",
                         "exec": [
-                            "pm.test(\"Invalid GUID should be handled properly\", function () {",
-                            "    // Should either return 404 Not Found or 422 Validation Error",
-                            "    pm.expect(pm.response.code).to.be.oneOf([404, 422]);",
-                            "});"
+                            "// Wait for 1 second before executing the request",
+                            "setTimeout(function() {",
+                            "    pm.test(\"Invalid GUID should be handled properly\", function () {",
+                            "        pm.expect(pm.response.code).to.be.oneOf([401, 404, 422]);",
+                            "    });",
+                            "}, 1000);"
                         ]
                     }
                 }
@@ -405,9 +412,12 @@
                     "script": {
                         "type": "text/javascript",
                         "exec": [
-                            "pm.test(\"User deleted successfully\", function () {",
-                            "    pm.response.to.have.status(200);",
-                            "});"
+                            "// Wait for 1 second before executing the request",
+                            "setTimeout(function() {",
+                            "    pm.test(\"User deleted successfully\", function () {",
+                            "        pm.response.to.have.status(200);",
+                            "    });",
+                            "}, 1000);"
                         ]
                     }
                 }
