@@ -56,8 +56,10 @@ jobs:
           docker compose down
 
       - name: Docker login
+        env:
+          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "disk0dancer" --password-stdin
+          echo "$DOCKER_PASSWORD" | docker login -u "disk0dancer" --password-stdin
 
       - name: Build and push Docker image
         run: |
