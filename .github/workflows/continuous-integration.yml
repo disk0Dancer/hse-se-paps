@@ -59,7 +59,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           username: "disk0dancer"
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          password: "dckr_pat_3AJD5L54YJRllVE0QhKX8ggLLSw"
 
       - name: Build and push Docker image
         run: |
