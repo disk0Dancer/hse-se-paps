@@ -55,11 +55,11 @@ jobs:
         run: |
           docker compose down
 
-      - name: Docker login
-        env:
-          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
-        run: |
-          echo "$DOCKER_PASSWORD" | docker login -u "disk0dancer" --password-stdin
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: "disk0dancer"
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
         run: |
