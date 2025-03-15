@@ -28,8 +28,9 @@ en: development of ai coding assistant
 - UV - python package manager
 - VLLM - for llms inference
 
-(!) Vllm is used to run LLMS on Apple Silicon, docker image was built from source and published on hub. [DOCKER IMAGE](https://hub.docker.com/repository/docker/disk0dancer/vllm-arm).
-To run VLLM inference on another platform update [compose.yaml](/compose.yaml).
+> Vllm is used to run LLMS on Apple Silicon, docker image was built from source and published on hub. [DOCKER IMAGE](https://hub.docker.com/repository/docker/disk0dancer/vllm-arm).
+>
+> To run VLLM inference on another platform update [compose.yaml](/compose.yaml).
 
 
 # Quick start
