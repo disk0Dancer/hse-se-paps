@@ -17,8 +17,7 @@ en: development of ai coding assistant
 - [x] Lab Work 5 : Docker + 
 - [x] Lab Work 6 : Patterns
 
-# Techical stack
-
+# Technical stack
 - Python 3.13
 - FastAPI
 - PostgreSQL - database
