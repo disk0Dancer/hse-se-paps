@@ -3,9 +3,9 @@ This repository contains implementation lab works
 
 # Tesis
 
-ru: Разработка интеллектуального ассистента программиста
+ru: Server-side application for code generation and integration with OpenAI API compatible servers, including development environments and continue.dev plugins
 
-en: development of ai coding assistant
+en: Server-side application for code generation and integration with OpenAI API compatible servers, including development environments and continue.dev plugins
 
 
 # TO DO
